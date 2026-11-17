@@ -1384,6 +1384,10 @@ function renderBountyMedia(bounty) {
       $("#noImageStatus").textContent = "WAITING APPROVAL / NO PUBLIC IMAGE";
       $("#noImageMessage").textContent =
         "PROOF HAS BEEN SUBMITTED PRIVATELY. IT BECOMES PUBLIC ONLY AFTER APPROVAL.";
+    } else if (bounty.status === "DISPUTED") {
+      $("#noImageStatus").textContent = "DISPUTED / HUMAN REVIEW";
+      $("#noImageMessage").textContent =
+        "EVIDENCE IS UNDER REVIEW. NO PUBLIC IMAGE OR PAYOUT UNTIL A REVIEWER DECIDES.";
     }
   }
 }
