@@ -5658,3 +5658,46 @@ img {
   .chain-panel-header { flex-direction: column; }
   .chain-stats { grid-template-columns: 1fr; }
 }
+
+/* PROOF OF PRESENCE / SIMPLIFIED INTERACTION V2 */
+.chain-panel {
+  margin: 16px 0 19px;
+  padding: 16px 18px;
+  background: #151813;
+  border: 1px solid rgba(251,255,18,.85);
+  box-shadow: none;
+}
+.chain-panel-header { align-items: center; gap: 12px; }
+.chain-panel .chain-kicker { font-size: 8px; letter-spacing: .12em; }
+.chain-panel h2 { font-size: clamp(16px,1.7vw,20px); margin: 5px 0 0; line-height: 1.15; }
+.chain-panel .chain-demo-tag { border-color: rgba(255,32,110,.75); padding: 6px 9px; font-size: 8px; }
+.chain-panel .chain-explainer { font-size: 11px; line-height: 1.55; color: #c7cbbf; margin: 10px 0 13px; }
+.chain-simple-steps { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 6px; }
+.chain-step { min-width:0; background: #24291e; padding: 10px 9px; }
+.chain-step span { display:block; font-size:8px; color:#aeb2a2; letter-spacing:.07em; margin-bottom:6px; }
+.chain-step strong { display:block; color:var(--lemon); font-size:11px; line-height:1.35; overflow-wrap:anywhere; }
+.chain-details { margin-top: 12px; border-top: 1px solid rgba(245,245,239,.16); }
+.chain-details summary { display: flex; align-items: center; justify-content: space-between; gap:12px; cursor:pointer; font-size:9px; font-weight:800; letter-spacing:.06em; padding:12px 0 0; list-style:none; color:var(--white); }
+.chain-details summary::-webkit-details-marker { display:none; }
+.chain-details summary span { color:var(--lemon); white-space:nowrap; font-size:8px; }
+.chain-details[open] summary span { color:var(--rose); }
+.chain-detail-explainer { margin:15px 0; max-width:55ch; color:#bfc4b9; font-size:11px; line-height:1.6; }
+.chain-details .chain-stat { padding: 11px 10px; }
+.chain-details .chain-stat span { font-size:7.5px; margin-bottom:6px; }
+.chain-details .chain-stat strong { font-size:11px; }
+.chain-details .chain-history { margin-top:14px; }
+.chain-details .chain-caveat { margin-top:12px; font-size:10px; }
+.chain-board-note { margin: 9px 0 0; max-width: 440px; font-size: 10px; line-height:1.55; }
+.chain-publish-info { padding: 11px 13px; gap:5px; margin:8px 0 14px; }
+.chain-publish-info strong { font-size:9px; }
+.chain-publish-info span { font-size:10px; }
+.chain-dispute { margin:15px 0; }
+@media (max-width:650px) {
+  .chain-panel { padding:14px 13px; margin:12px 0 16px; }
+  .chain-panel-header { flex-direction:row; }
+  .chain-simple-steps { grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; }
+  .chain-step { padding:8px 5px; }
+  .chain-step span { font-size:7px; }
+  .chain-step strong { font-size:10px; }
+  .chain-details .chain-stats { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
