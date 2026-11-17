@@ -410,7 +410,7 @@ const homeStatusPresets = {
   bounties: () => {
     const open = bounties.filter(item => item.status === "OPEN").length;
     const active = bounties.filter(
-      item => item.status === "IN PROGRESS" || item.status === "WAITING APPROVAL"
+      item => item.status === "IN PROGRESS" || item.status === "WAITING APPROVAL" || item.status === "DISPUTED"
     ).length;
 
     return {
@@ -1154,6 +1154,68 @@ $("#sellRecordForm").addEventListener("submit", event => {
   }, 450);
 });
 
+
+/* PROOF OF PRESENCE — SIMULATED SMART CONTRACT, NOT A LIVE BLOCKCHAIN */
+function ensureConceptBounty(bounty) {
+  if (!bounty.concept) bounty.concept = {
+    escrow: bounty.status === "FULFILLED" ? "RELEASED (DEMO)" : "LOCKED (DEMO)",
+    review: bounty.status === "FULFILLED" ? "HUMAN APPROVED" : "AWAITING PROOF",
+    hash: "NOT COMPUTED",
+    events: ["CONCEPT RECORD CREATED / NO BLOCKCHAIN CONNECTION",
+      bounty.status === "FULFILLED" ? "PRELOADED EXAMPLE / DEMO PAYOUT" : "SIMULATED REWARD RESERVED"]
+  };
+  return bounty.concept;
+}
+function logConcept(bounty, event) { ensureConceptBounty(bounty).events.push(event); }
+function renderConceptPanel(bounty) {
+  const c = ensureConceptBounty(bounty);
+  $("#chainEscrowAmount").textContent = money(bounty.reward);
+  $("#chainEscrowState").textContent = c.escrow;
+  $("#chainProofHash").textContent = c.hash;
+  $("#chainHumanState").textContent = c.review;
+  $("#chainReceipt").textContent = bounty.status === "FULFILLED" ? "DEMO SETTLEMENT / "+bounty.id : "NOT ISSUED";
+  const log = $("#chainEventLog");
+  log.replaceChildren();
+  c.events.forEach((message,i) => {
+    const li = document.createElement("li");
+    li.dataset.index = String(i+1).padStart(2,"0");
+    li.textContent = message;
+    log.appendChild(li);
+  });
+}
+async function computeConceptHash(bounty,file) {
+  const c = ensureConceptBounty(bounty);
+  if (!file || !window.crypto?.subtle) c.hash = "UNAVAILABLE / WEB CRYPTO REQUIRED";
+  else if(file.size > 30*1024*1024) c.hash = "FILE TOO LARGE FOR DEMO HASH";
+  else try {
+    const digest = await window.crypto.subtle.digest("SHA-256",await file.arrayBuffer());
+    const fingerprint = [...new Uint8Array(digest)].map(x=>x.toString(16).padStart(2,"0")).join("");
+    if(bounty.status === "WAITING APPROVAL" || bounty.status === "DISPUTED") {
+      c.hash = "SHA-256 "+fingerprint.slice(0,16)+"…";
+      logConcept(bounty,"LOCAL FILE FINGERPRINT COMPUTED / NOT ON CHAIN");
+    }
+  } catch(e) {c.hash = "HASH UNAVAILABLE";}
+  if(bounties[currentBountyIndex]===bounty) renderConceptPanel(bounty);
+}
+function settleConcept(bounty,approval) {
+  if(bounty.status!=="WAITING APPROVAL" && bounty.status!=="DISPUTED") return;
+  bounty.status = "FULFILLED";
+  bounty.missionStage = 5;
+  const c = ensureConceptBounty(bounty);
+  c.review = approval;
+  c.escrow = "RELEASED (DEMO)";
+  logConcept(bounty,approval+" / HUMAN DECISION");
+  logConcept(bounty,"SMART CONTRACT PAYOUT SIMULATED: "+money(bounty.reward));
+  logConcept(bounty,"DEMO SETTLEMENT / ZERO ON-CHAIN TRANSACTIONS");
+  if(bounty.pendingProofImage) {
+    bounty.proofImage = bounty.pendingProofImage;
+    bounty.pendingProofImage = "";
+    proofObjectUrl = null;
+  }
+  addDiscussionMessage({user:"SYSTEM",linkText:bounty.id,linkType:"bounty",linkId:bounty.id,linkIndex:currentBountyIndex,text:bounty.title+" approved — DEMO payout "+money(bounty.reward)+" (no real money)."});
+  renderBountyDetail(); renderBounties();
+}
+
 /* =====================================================
    BOUNTY BOARD
 ===================================================== */
@@ -1162,6 +1224,7 @@ function statusClass(status) {
   if (status === "OPEN") return "status-open";
   if (status === "IN PROGRESS") return "status-progress";
   if (status === "WAITING APPROVAL") return "status-waiting";
+  if (status === "DISPUTED") return "status-disputed";
   return "status-fulfilled";
 }
 
@@ -1351,6 +1414,7 @@ function renderBountyDetail() {
 
   renderBountyMedia(bounty);
   renderBountyFlow(bounty);
+  renderConceptPanel(bounty);
 }
 
 function renderBountyFlow(bounty) {
@@ -1358,11 +1422,13 @@ function renderBountyFlow(bounty) {
   const missionPanel = $("#missionPanel");
   const requesterReview = $("#requesterReview");
   const fulfilledPanel = $("#fulfilledPanel");
+  const disputePanel = $("#chainDisputePanel");
 
   takeButton.classList.add("hidden");
   missionPanel.classList.add("hidden");
   requesterReview.classList.add("hidden");
   fulfilledPanel.classList.add("hidden");
+  disputePanel.classList.add("hidden");
   $("#privateProofPreview").classList.add("hidden");
   $("#privateProofImage").removeAttribute("src");
 
@@ -1391,6 +1457,12 @@ function renderBountyFlow(bounty) {
 
   const stage = bounty.missionStage || 1;
   setMissionStep(stage);
+
+  if (bounty.status === "DISPUTED") {
+    $("#missionStateLabel").textContent = "DISPUTE / REVIEW REQUIRED";
+    disputePanel.classList.remove("hidden");
+    return;
+  }
 
   if (bounty.status === "WAITING APPROVAL") {
     $("#missionStateLabel").textContent = "PROOF SUBMITTED";
@@ -1422,8 +1494,10 @@ function renderBountyFlow(bounty) {
 $("#takeBountyButton").addEventListener("click", () => {
   const bounty = bounties[currentBountyIndex];
 
+  if (ensureConceptBounty(bounty).escrow !== "LOCKED (DEMO)") return;
   bounty.status = "IN PROGRESS";
   bounty.missionStage = 1;
+  logConcept(bounty, "RUNNER ACCEPTED / DEMO FUNDS REMAIN RESERVED");
 
   if (!bounty.runner) {
     bounty.runner = "@YOU";
@@ -1490,6 +1564,9 @@ $("#submitProofButton").addEventListener("click", () => {
 
   bounty.status = "WAITING APPROVAL";
   bounty.missionStage = 4;
+  ensureConceptBounty(bounty).review = "AWAITING HUMAN APPROVAL";
+  logConcept(bounty, "PROOF SUBMITTED / FILE HELD OFF CHAIN");
+  computeConceptHash(bounty, $("#bountyUpload").files[0]);
 
   if (pendingProofDataUrl) {
     bounty.pendingProofImage = pendingProofDataUrl;
@@ -1509,26 +1586,31 @@ $("#submitProofButton").addEventListener("click", () => {
 });
 
 $("#approveProofButton").addEventListener("click", () => {
+  settleConcept(bounties[currentBountyIndex], "REQUESTER APPROVED");
+});
+$("#openDisputeButton").addEventListener("click", () => {
   const bounty = bounties[currentBountyIndex];
-
-  bounty.status = "FULFILLED";
-  bounty.missionStage = 5;
-
-  if (bounty.pendingProofImage) {
-    bounty.proofImage = bounty.pendingProofImage;
-    bounty.pendingProofImage = "";
-    proofObjectUrl = null;
-  }
-
-  addDiscussionMessage({
-    user: "SYSTEM",
-    linkText: bounty.id,
-    linkType: "bounty",
-    linkId: bounty.id,
-    linkIndex: currentBountyIndex,
-    text: `${bounty.title} was approved and ${money(bounty.reward)} was paid.`
-  });
-
+  if (bounty.status !== "WAITING APPROVAL") return;
+  bounty.status = "DISPUTED";
+  ensureConceptBounty(bounty).review = "DISPUTED / REVIEW PENDING";
+  logConcept(bounty, "REQUESTER DISPUTED PROOF / ESCROW STILL LOCKED");
+  renderBountyDetail();
+  renderBounties();
+});
+$("#disputeApproveButton").addEventListener("click", () => {
+  settleConcept(bounties[currentBountyIndex], "SIMULATED INDEPENDENT REVIEW APPROVED");
+});
+$("#disputeRetryButton").addEventListener("click", () => {
+  const bounty = bounties[currentBountyIndex];
+  if (bounty.status !== "DISPUTED") return;
+  bounty.status = "IN PROGRESS";
+  bounty.missionStage = 3;
+  bounty.pendingProofImage = "";
+  const concept = ensureConceptBounty(bounty);
+  concept.hash = "AWAITING REPLACEMENT FILE";
+  concept.review = "NEW PROOF REQUESTED";
+  logConcept(bounty, "REVIEWER REQUESTED REPLACEMENT EVIDENCE / ESCROW LOCKED");
+  cleanupTemporaryProof();
   renderBountyDetail();
   renderBounties();
 });
@@ -1561,7 +1643,8 @@ $("#bountyForm").addEventListener("submit", event => {
     proofImage: "",
     pendingProofImage: "",
     status: "OPEN",
-    missionStage: 0
+    missionStage: 0,
+    concept: {escrow:"LOCKED (DEMO)",review:"AWAITING PROOF",hash:"NOT SUBMITTED",events:["BOUNTY PUBLISHED / CONCEPT SMART CONTRACT","DEMO ESCROW RESERVED: "+money(reward)+" / NO REAL FUNDS"]}
   };
 
   bounties.push(newBounty);
@@ -1578,7 +1661,7 @@ $("#bountyForm").addEventListener("submit", event => {
   event.target.reset();
 
   $("#postFormMessage").textContent =
-    "BOUNTY PUBLISHED / WAITING FOR RUNNER";
+    "DEMO ESCROW RESERVED / BOUNTY PUBLISHED / NO REAL FUNDS";
 
   setTimeout(() => {
     $("#postFormMessage").textContent = "";
