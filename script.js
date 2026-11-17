@@ -1210,7 +1210,6 @@ function settleConcept(bounty,approval) {
   if(bounty.pendingProofImage) {
     bounty.proofImage = bounty.pendingProofImage;
     bounty.pendingProofImage = "";
-    proofObjectUrl = null;
   }
   addDiscussionMessage({user:"SYSTEM",linkText:bounty.id,linkType:"bounty",linkId:bounty.id,linkIndex:currentBountyIndex,text:bounty.title+" approved — DEMO payout "+money(bounty.reward)+" (no real money)."});
   renderBountyDetail(); renderBounties();
