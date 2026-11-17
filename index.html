@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=concept-final-v3">
+  <link rel="stylesheet" href="style.css?v=blockchain-concept-v1">
 </head>
 
 <body>
@@ -409,6 +409,7 @@
           requested place, completes the task, and returns with proof.
         </p>
 
+        <p class="chain-board-note"><strong>BLOCKCHAIN CONCEPT / DEMO</strong> &nbsp; Smart contract escrow and verification are simulated. No live blockchain transactions or real funds.</p>
         <div class="bounty-board-counts">
           <div><span>OPEN</span><strong id="openCount">00</strong></div>
           <div><span>ACTIVE</span><strong id="activeCount">00</strong></div>
@@ -422,6 +423,7 @@
       <button class="bounty-filter" type="button" data-filter="OPEN">OPEN</button>
       <button class="bounty-filter" type="button" data-filter="IN PROGRESS">IN PROGRESS</button>
       <button class="bounty-filter" type="button" data-filter="WAITING APPROVAL">WAITING APPROVAL</button>
+      <button class="bounty-filter" type="button" data-filter="DISPUTED">DISPUTED</button>
       <button class="bounty-filter" type="button" data-filter="FULFILLED">FULFILLED</button>
     </section>
 
@@ -511,6 +513,30 @@
           <div><dt>POSTED BY</dt><dd id="bountyDetailOwner"></dd></div>
         </dl>
 
+        <section class="chain-panel" aria-labelledby="chainPanelTitle">
+          <div class="chain-panel-header">
+            <div>
+              <span class="chain-kicker">BLOCKCHAIN / CONCEPT PROTOTYPE</span>
+              <h2 id="chainPanelTitle">PROOF OF PRESENCE <span class="chain-asterisk">↗</span></h2>
+            </div>
+            <span class="chain-demo-tag">SIMULATION ONLY</span>
+          </div>
+          <p class="chain-explainer">A proposed smart contract holds the bounty until an authorized reviewer approves proof. A file fingerprint identifies submitted data; it cannot prove the event happened.</p>
+          <div class="chain-stats">
+            <div class="chain-stat"><span>ESCROW / DEMO FUNDS</span><strong id="chainEscrowAmount">$0.00</strong></div>
+            <div class="chain-stat"><span>CONTRACT STATE</span><strong id="chainEscrowState">LOCKED / SIMULATED</strong></div>
+            <div class="chain-stat"><span>PROOF FINGERPRINT</span><strong class="chain-hash" id="chainProofHash">NOT SUBMITTED</strong></div>
+            <div class="chain-stat"><span>HUMAN VERIFICATION</span><strong id="chainHumanState">AWAITING PROOF</strong></div>
+            <div class="chain-stat"><span>SETTLEMENT RECORD</span><strong id="chainReceipt">NOT ISSUED</strong></div>
+            <div class="chain-stat"><span>ACTUAL ON-CHAIN STATUS</span><strong>NOT DEPLOYED</strong></div>
+          </div>
+          <div class="chain-history">
+            <span>PROPOSED RECORD / DEMO EVENT LOG</span>
+            <ol id="chainEventLog"></ol>
+          </div>
+          <p class="chain-caveat">No wallet connected. No funds are transferred. The SHA-256 fingerprint is computed locally in your browser, not written to a blockchain. Human approval is separate from cryptographic verification.</p>
+        </section>
+
         <div class="bounty-action-area" id="bountyActionArea">
           <button class="take-bounty-button" id="takeBountyButton" type="button">
             TAKE BOUNTY <span>→</span>
@@ -594,7 +620,7 @@
         <section class="requester-review hidden" id="requesterReview">
           <div class="review-head">
             <span>REQUESTER FLOW</span>
-            <strong>PRIVATE PROOF REVIEW</strong>
+            <strong>HUMAN VERIFICATION / NOT AN ON-CHAIN FACT</strong>
           </div>
 
           <p>
@@ -609,8 +635,24 @@
           </div>
 
           <button class="approve-proof-button" id="approveProofButton" type="button">
-            APPROVE PROOF + RELEASE PAYMENT →
+            APPROVE + SIMULATE CONTRACT PAYOUT →
           </button>
+          <button class="dispute-open-button" id="openDisputeButton" type="button">
+            DISPUTE THIS PROOF / HOLD DEMO FUNDS →
+          </button>
+          <p class="chain-review-note">Approval is a human decision. A blockchain record cannot confirm what happened at the location.</p>
+        </section>
+
+        <section class="chain-dispute hidden" id="chainDisputePanel">
+          <div class="review-head">
+            <span>DISPUTE / CONCEPT PROTOTYPE</span>
+            <strong>WHO DECIDES WHAT COUNTS AS PROOF?</strong>
+          </div>
+          <p>The reward remains locked in this simulation. An independent reviewer is represented by the two choices below; no actual third party or blockchain arbitration is connected.</p>
+          <div class="chain-dispute-actions">
+            <button class="chain-dispute-approve" id="disputeApproveButton" type="button">REVIEWER: ACCEPT PROOF + PAY →</button>
+            <button class="chain-dispute-retry" id="disputeRetryButton" type="button">REVIEWER: REQUEST NEW PROOF ↺</button>
+          </div>
         </section>
 
         <section class="fulfilled-panel hidden" id="fulfilledPanel">
@@ -704,8 +746,12 @@
         </div>
 
 
+        <div class="chain-publish-info">
+          <strong>01 / LOCK DEMO ESCROW</strong>
+          <span>A simulated contract reserves the selected reward when you publish. Real money, wallets and blockchain deployment are not involved.</span>
+        </div>
         <button class="publish-bounty-button" type="submit">
-          PUBLISH BOUNTY <span>→</span>
+          LOCK DEMO FUNDS + PUBLISH <span>→</span>
         </button>
 
         <div class="form-message" id="postFormMessage"></div>
@@ -961,6 +1007,6 @@
     <div class="transition-label" id="transitionLabel">LIVE MARKET</div>
   </div>
 
-  <script src="script.js?v=concept-final-v2"></script>
+  <script src="script.js?v=blockchain-concept-v1"></script>
 </body>
 </html>
