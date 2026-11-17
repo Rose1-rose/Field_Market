@@ -1174,6 +1174,12 @@ function renderConceptPanel(bounty) {
   $("#chainProofHash").textContent = c.hash;
   $("#chainHumanState").textContent = c.review;
   $("#chainReceipt").textContent = bounty.status === "FULFILLED" ? "DEMO SETTLEMENT / "+bounty.id : "NOT ISSUED";
+  $("#chainStepEscrow").textContent = bounty.status === "FULFILLED" ? "Released" : "Reserved";
+  $("#chainStepProof").textContent = bounty.status === "FULFILLED" ? "Approved" :
+    bounty.status === "DISPUTED" ? "Disputed" :
+    bounty.status === "WAITING APPROVAL" ? "In review" :
+    bounty.status === "IN PROGRESS" ? "To upload" : "Waiting";
+  $("#chainStepPayout").textContent = bounty.status === "FULFILLED" ? "Paid (demo)" : "Pending";
   const log = $("#chainEventLog");
   log.replaceChildren();
   c.events.forEach((message,i) => {
@@ -1255,6 +1261,7 @@ function renderBounties() {
     .map((bounty, index) => ({ bounty, index }))
     .filter(({ bounty }) => {
       if (currentBountyFilter === "ALL") return true;
+      if (currentBountyFilter === "ACTIVE") return ["IN PROGRESS","WAITING APPROVAL","DISPUTED"].includes(bounty.status);
       return bounty.status === currentBountyFilter;
     });
 
@@ -1332,26 +1339,12 @@ function cleanupTemporaryProof() {
 function setMissionStep(stage) {
   const steps = [
     $("#missionStepTake"),
-    $("#missionStepLocation"),
-    $("#missionStepComplete"),
     $("#missionStepProof"),
     $("#missionStepApproval")
   ];
-
-  steps.forEach((stepEl, index) => {
-    stepEl.classList.remove("done", "active");
-
-    if (index < stage) {
-      stepEl.classList.add("done");
-    }
-
-    if (index === stage && stage < 5) {
-      stepEl.classList.add("active");
-    }
-
-    if (stage >= 5) {
-      stepEl.classList.add("done");
-    }
+  steps.forEach((element, index) => {
+    element.classList.toggle("done", index < stage);
+    element.classList.toggle("active", index === stage && stage < steps.length);
   });
 }
 
@@ -1427,71 +1420,41 @@ function renderBountyFlow(bounty) {
   const fulfilledPanel = $("#fulfilledPanel");
   const disputePanel = $("#chainDisputePanel");
 
+  [missionPanel, requesterReview, fulfilledPanel, disputePanel].forEach(panel => panel.classList.add("hidden"));
   takeButton.classList.add("hidden");
-  missionPanel.classList.add("hidden");
-  requesterReview.classList.add("hidden");
-  fulfilledPanel.classList.add("hidden");
-  disputePanel.classList.add("hidden");
   $("#privateProofPreview").classList.add("hidden");
   $("#privateProofImage").removeAttribute("src");
-
-  $("#arriveButton").classList.add("hidden");
-  $("#completeTaskButton").classList.add("hidden");
   $("#uploadZone").classList.add("hidden");
 
   if (bounty.status === "OPEN") {
     takeButton.classList.remove("hidden");
-
-    takeButton.innerHTML =
-      bounty.owner === "YOU"
-        ? `SIMULATE RUNNER TAKING THIS BOUNTY <span>→</span>`
-        : `TAKE BOUNTY <span>→</span>`;
-
+    takeButton.innerHTML = bounty.owner === "YOU"
+      ? `SIMULATE RUNNER ACCEPTING <span>→</span>`
+      : `ACCEPT BOUNTY <span>→</span>`;
     return;
   }
-
   if (bounty.status === "FULFILLED") {
     fulfilledPanel.classList.remove("hidden");
-    $("#paidLabel").textContent = `${money(bounty.reward)} PAID`;
+    $("#paidLabel").textContent = `${money(bounty.reward)} PAID (DEMO)`;
     return;
   }
-
-  missionPanel.classList.remove("hidden");
-
-  const stage = bounty.missionStage || 1;
-  setMissionStep(stage);
-
   if (bounty.status === "DISPUTED") {
-    $("#missionStateLabel").textContent = "DISPUTE / REVIEW REQUIRED";
     disputePanel.classList.remove("hidden");
     return;
   }
-
   if (bounty.status === "WAITING APPROVAL") {
-    $("#missionStateLabel").textContent = "PROOF SUBMITTED";
     requesterReview.classList.remove("hidden");
-
     if (bounty.pendingProofImage) {
       $("#privateProofPreview").classList.remove("hidden");
       $("#privateProofImage").src = bounty.pendingProofImage;
-    } else {
-      $("#privateProofPreview").classList.add("hidden");
-      $("#privateProofImage").removeAttribute("src");
     }
-
     return;
   }
-
-  if (stage <= 1) {
-    $("#missionStateLabel").textContent = "MISSION ACCEPTED";
-    $("#arriveButton").classList.remove("hidden");
-  } else if (stage === 2) {
-    $("#missionStateLabel").textContent = "ON SITE";
-    $("#completeTaskButton").classList.remove("hidden");
-  } else if (stage >= 3) {
-    $("#missionStateLabel").textContent = "TASK COMPLETE / PROOF NEEDED";
-    $("#uploadZone").classList.remove("hidden");
-  }
+  // Runner can upload directly after accepting. No redundant arrival/complete buttons.
+  missionPanel.classList.remove("hidden");
+  $("#missionStateLabel").textContent = "ADD YOUR FIELD EVIDENCE";
+  setMissionStep(1);
+  $("#uploadZone").classList.remove("hidden");
 }
 
 $("#takeBountyButton").addEventListener("click", () => {
@@ -1517,20 +1480,6 @@ $("#takeBountyButton").addEventListener("click", () => {
 
   renderBountyDetail();
   renderBounties();
-});
-
-$("#arriveButton").addEventListener("click", () => {
-  const bounty = bounties[currentBountyIndex];
-  bounty.missionStage = 2;
-
-  renderBountyDetail();
-});
-
-$("#completeTaskButton").addEventListener("click", () => {
-  const bounty = bounties[currentBountyIndex];
-  bounty.missionStage = 3;
-
-  renderBountyDetail();
 });
 
 $("#bountyUpload").addEventListener("change", event => {
@@ -1607,7 +1556,7 @@ $("#disputeRetryButton").addEventListener("click", () => {
   const bounty = bounties[currentBountyIndex];
   if (bounty.status !== "DISPUTED") return;
   bounty.status = "IN PROGRESS";
-  bounty.missionStage = 3;
+  bounty.missionStage = 1;
   bounty.pendingProofImage = "";
   const concept = ensureConceptBounty(bounty);
   concept.hash = "AWAITING REPLACEMENT FILE";
@@ -1664,7 +1613,7 @@ $("#bountyForm").addEventListener("submit", event => {
   event.target.reset();
 
   $("#postFormMessage").textContent =
-    "DEMO ESCROW RESERVED / BOUNTY PUBLISHED / NO REAL FUNDS";
+    "BOUNTY PUBLISHED / REWARD RESERVED (DEMO)";
 
   setTimeout(() => {
     $("#postFormMessage").textContent = "";
