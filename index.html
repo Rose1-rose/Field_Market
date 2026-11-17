@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=blockchain-concept-v1">
+  <link rel="stylesheet" href="style.css?v=simplified-proof-v2">
 </head>
 
 <body>
@@ -409,7 +409,7 @@
           requested place, completes the task, and returns with proof.
         </p>
 
-        <p class="chain-board-note"><strong>BLOCKCHAIN CONCEPT / DEMO</strong> &nbsp; Smart contract escrow and verification are simulated. No live blockchain transactions or real funds.</p>
+        <p class="chain-board-note">Choose an open request, submit a photo, and approve the result. <strong>Blockchain features are simulated.</strong></p>
         <div class="bounty-board-counts">
           <div><span>OPEN</span><strong id="openCount">00</strong></div>
           <div><span>ACTIVE</span><strong id="activeCount">00</strong></div>
@@ -421,9 +421,7 @@
     <section class="bounty-filter-bar">
       <button class="bounty-filter active" type="button" data-filter="ALL">ALL</button>
       <button class="bounty-filter" type="button" data-filter="OPEN">OPEN</button>
-      <button class="bounty-filter" type="button" data-filter="IN PROGRESS">IN PROGRESS</button>
-      <button class="bounty-filter" type="button" data-filter="WAITING APPROVAL">WAITING APPROVAL</button>
-      <button class="bounty-filter" type="button" data-filter="DISPUTED">DISPUTED</button>
+      <button class="bounty-filter" type="button" data-filter="ACTIVE">ACTIVE</button>
       <button class="bounty-filter" type="button" data-filter="FULFILLED">FULFILLED</button>
     </section>
 
@@ -516,25 +514,34 @@
         <section class="chain-panel" aria-labelledby="chainPanelTitle">
           <div class="chain-panel-header">
             <div>
-              <span class="chain-kicker">BLOCKCHAIN / CONCEPT PROTOTYPE</span>
-              <h2 id="chainPanelTitle">PROOF OF PRESENCE <span class="chain-asterisk">↗</span></h2>
+              <span class="chain-kicker">FIELD MARKET / BLOCKCHAIN CONCEPT</span>
+              <h2 id="chainPanelTitle">PROOF OF PRESENCE</h2>
             </div>
-            <span class="chain-demo-tag">SIMULATION ONLY</span>
+            <span class="chain-demo-tag">DEMO</span>
           </div>
-          <p class="chain-explainer">A proposed smart contract holds the bounty until an authorized reviewer approves proof. A file fingerprint identifies submitted data; it cannot prove the event happened.</p>
-          <div class="chain-stats">
-            <div class="chain-stat"><span>ESCROW / DEMO FUNDS</span><strong id="chainEscrowAmount">$0.00</strong></div>
-            <div class="chain-stat"><span>CONTRACT STATE</span><strong id="chainEscrowState">LOCKED / SIMULATED</strong></div>
-            <div class="chain-stat"><span>PROOF FINGERPRINT</span><strong class="chain-hash" id="chainProofHash">NOT SUBMITTED</strong></div>
-            <div class="chain-stat"><span>HUMAN VERIFICATION</span><strong id="chainHumanState">AWAITING PROOF</strong></div>
-            <div class="chain-stat"><span>SETTLEMENT RECORD</span><strong id="chainReceipt">NOT ISSUED</strong></div>
-            <div class="chain-stat"><span>ACTUAL ON-CHAIN STATUS</span><strong>NOT DEPLOYED</strong></div>
+          <p class="chain-explainer">A payment can be recorded. The moment still needs a witness.</p>
+          <div class="chain-simple-steps" aria-label="Bounty payment and verification progress">
+            <div class="chain-step"><span>01 / FUNDS</span><strong id="chainStepEscrow">Reserved</strong></div>
+            <div class="chain-step"><span>02 / PROOF</span><strong id="chainStepProof">Waiting</strong></div>
+            <div class="chain-step"><span>03 / PAYOUT</span><strong id="chainStepPayout">Pending</strong></div>
           </div>
-          <div class="chain-history">
-            <span>PROPOSED RECORD / DEMO EVENT LOG</span>
-            <ol id="chainEventLog"></ol>
-          </div>
-          <p class="chain-caveat">No wallet connected. No funds are transferred. The SHA-256 fingerprint is computed locally in your browser, not written to a blockchain. Human approval is separate from cryptographic verification.</p>
+          <details class="chain-details">
+            <summary>HOW DOES BLOCKCHAIN FIT? <span>VIEW DETAILS +</span></summary>
+            <p class="chain-detail-explainer">A proposed smart contract holds the reward until a person approves the image. The contract can track that decision and payment, but cannot confirm the photographed event really happened.</p>
+            <div class="chain-stats">
+              <div class="chain-stat"><span>RESERVED DEMO REWARD</span><strong id="chainEscrowAmount">$0.00</strong></div>
+              <div class="chain-stat"><span>SMART CONTRACT</span><strong id="chainEscrowState">LOCKED (DEMO)</strong></div>
+              <div class="chain-stat"><span>PHOTO FINGERPRINT</span><strong class="chain-hash" id="chainProofHash">NOT SUBMITTED</strong></div>
+              <div class="chain-stat"><span>PERSON REVIEWING</span><strong id="chainHumanState">AWAITING PROOF</strong></div>
+              <div class="chain-stat"><span>PAYMENT RECORD</span><strong id="chainReceipt">NOT ISSUED</strong></div>
+              <div class="chain-stat"><span>LIVE BLOCKCHAIN</span><strong>NOT CONNECTED</strong></div>
+            </div>
+            <div class="chain-history">
+              <span>DEMO RECORD HISTORY</span>
+              <ol id="chainEventLog"></ol>
+            </div>
+            <p class="chain-caveat">Concept prototype only. No real money, blockchain transactions or wallet connection. File fingerprints are calculated locally and cannot verify real-world presence.</p>
+          </details>
         </section>
 
         <div class="bounty-action-area" id="bountyActionArea">
@@ -551,53 +558,15 @@
 
           <div class="mission-steps">
             <div class="mission-step" id="missionStepTake">
-              <span>01</span>
-              <div>
-                <strong>TAKE BOUNTY</strong>
-                <small>Task assigned to runner.</small>
-              </div>
+              <span>01</span><div><strong>ACCEPT TASK</strong><small>Reward reserved in demo escrow.</small></div>
             </div>
-
-            <div class="mission-step" id="missionStepLocation">
-              <span>02</span>
-              <div>
-                <strong>GO TO LOCATION</strong>
-                <small>Physically arrive at the requested place.</small>
-              </div>
-            </div>
-
-            <div class="mission-step" id="missionStepComplete">
-              <span>03</span>
-              <div>
-                <strong>COMPLETE TASK</strong>
-                <small>Perform the requested action.</small>
-              </div>
-            </div>
-
             <div class="mission-step" id="missionStepProof">
-              <span>04</span>
-              <div>
-                <strong>UPLOAD PROOF</strong>
-                <small>Submit evidence from the field.</small>
-              </div>
+              <span>02</span><div><strong>UPLOAD PROOF</strong><small>Visit the location and take your photo.</small></div>
             </div>
-
             <div class="mission-step" id="missionStepApproval">
-              <span>05</span>
-              <div>
-                <strong>APPROVED / GET PAID</strong>
-                <small>Requester verifies proof and releases reward.</small>
-              </div>
+              <span>03</span><div><strong>REVIEW + PAYMENT</strong><small>Human review, then demo payout.</small></div>
             </div>
           </div>
-
-          <button class="flow-button" id="arriveButton" type="button">
-            SIMULATE ARRIVAL AT LOCATION →
-          </button>
-
-          <button class="flow-button hidden" id="completeTaskButton" type="button">
-            MARK TASK COMPLETE →
-          </button>
 
           <div class="upload-zone hidden" id="uploadZone">
             <label class="proof-upload-label" for="bountyUpload">
@@ -620,13 +589,11 @@
         <section class="requester-review hidden" id="requesterReview">
           <div class="review-head">
             <span>REQUESTER FLOW</span>
-            <strong>HUMAN VERIFICATION / NOT AN ON-CHAIN FACT</strong>
+            <strong>REVIEW SUBMITTED PROOF</strong>
           </div>
 
           <p>
-            The runner submitted proof. This preview is visible to the requester
-            for approval, but it does not become a public bounty image until the
-            bounty is fulfilled.
+            Check whether the photo matches the request. You make the decision, not the blockchain.
           </p>
 
           <div class="private-proof-preview hidden" id="privateProofPreview">
@@ -635,12 +602,12 @@
           </div>
 
           <button class="approve-proof-button" id="approveProofButton" type="button">
-            APPROVE + SIMULATE CONTRACT PAYOUT →
+            APPROVE + RELEASE DEMO REWARD →
           </button>
           <button class="dispute-open-button" id="openDisputeButton" type="button">
-            DISPUTE THIS PROOF / HOLD DEMO FUNDS →
+            NOT SURE? REQUEST REVIEW →
           </button>
-          <p class="chain-review-note">Approval is a human decision. A blockchain record cannot confirm what happened at the location.</p>
+
         </section>
 
         <section class="chain-dispute hidden" id="chainDisputePanel">
@@ -700,9 +667,7 @@
         <div class="post-flow-note">
           <span>01 ADD DETAILS</span>
           <span>02 PUBLISH</span>
-          <span>03 WAIT FOR RUNNER</span>
-          <span>04 REVIEW PROOF</span>
-          <span>05 APPROVE</span>
+          <span>03 REVIEW + PAYOUT</span>
         </div>
       </div>
 
@@ -747,11 +712,11 @@
 
 
         <div class="chain-publish-info">
-          <strong>01 / LOCK DEMO ESCROW</strong>
-          <span>A simulated contract reserves the selected reward when you publish. Real money, wallets and blockchain deployment are not involved.</span>
+          <strong>REWARD RESERVED IN DEMO ESCROW</strong>
+          <span>This is a concept prototype. No real funds move.</span>
         </div>
         <button class="publish-bounty-button" type="submit">
-          LOCK DEMO FUNDS + PUBLISH <span>→</span>
+          PUBLISH BOUNTY <span>→</span>
         </button>
 
         <div class="form-message" id="postFormMessage"></div>
@@ -1007,6 +972,6 @@
     <div class="transition-label" id="transitionLabel">LIVE MARKET</div>
   </div>
 
-  <script src="script.js?v=blockchain-concept-v1"></script>
+  <script src="script.js?v=simplified-proof-v2"></script>
 </body>
 </html>
