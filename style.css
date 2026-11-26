@@ -5701,3 +5701,132 @@ img {
   .chain-step strong { font-size:10px; }
   .chain-details .chain-stats { grid-template-columns:repeat(2,minmax(0,1fr)); }
 }
+
+
+/* FIELD MARKET / METAMASK WALLET – optional, read-only connection */
+.wallet-dock {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 350;
+  width: min(316px, calc(100vw - 36px));
+  color: var(--white);
+  font-family: Arial, Helvetica, sans-serif;
+}
+.wallet-pill {
+  margin-left: auto;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 41px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 10px 13px;
+  border: 1px solid var(--lemon);
+  background: var(--night);
+  color: var(--lemon);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .07em;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 rgba(0,0,0,.22);
+}
+.wallet-pill-mark { font-size: 17px; line-height: 12px; color: var(--rose); }
+.wallet-pill-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--rose);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.wallet-dock.is-connected .wallet-pill-dot { background: #79f5a4; }
+.wallet-pill:hover, .wallet-pill:focus-visible { background: var(--lemon); color: var(--night); }
+.wallet-pill:disabled { cursor: wait; opacity: .7; }
+.wallet-panel {
+  margin-top: 8px;
+  padding: 17px;
+  border: 1px solid var(--lemon);
+  background: #141812;
+  box-shadow: 6px 6px 0 rgba(0,0,0,.28);
+  max-height: min(70vh, 460px);
+  overflow-y: auto;
+}
+.wallet-panel-heading { display: flex; flex-direction: column; gap: 7px; margin-bottom: 15px; }
+.wallet-panel-heading span { color: var(--rose); font-size: 8px; font-weight: 900; letter-spacing: .1em; }
+.wallet-panel-heading strong { color: var(--lemon); font-size: 13px; letter-spacing: .06em; }
+.wallet-meta-row {
+  border-top: 1px solid rgba(245,245,239,.14);
+  padding: 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.wallet-meta-row span { font-size: 8px; font-weight: 800; color: var(--grey); letter-spacing: .1em; }
+.wallet-meta-row strong {
+  font-size: 11px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--white);
+  overflow-wrap: anywhere;
+}
+.wallet-primary, .wallet-secondary {
+  margin-top: 8px;
+  width: 100%;
+  min-height: 39px;
+  border: 1px solid var(--lemon);
+  background: var(--lemon);
+  color: var(--night);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .07em;
+  cursor: pointer;
+}
+.wallet-secondary { background: transparent; color: var(--lemon); }
+.wallet-primary:hover, .wallet-secondary:hover { border-color: var(--rose); background: var(--rose); color: var(--night); }
+.wallet-feedback { margin: 13px 0 0; font-size: 10px; line-height: 1.55; color: #c0c4b7; }
+.chain-wallet-row {
+  border: 1px solid rgba(251,255,18,.36);
+  background: rgba(251,255,18,.055);
+  padding: 10px 11px;
+  margin: 12px 0;
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  gap: 8px 12px;
+  align-items: center;
+}
+.chain-wallet-row > span {
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .1em;
+  color: var(--grey);
+}
+.chain-wallet-row > strong {
+  grid-column: 1;
+  font-size: 10px;
+  font-family: ui-monospace, Menlo, monospace;
+  overflow-wrap: anywhere;
+  color: var(--lemon);
+}
+.chain-wallet-row > button {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  border: 1px solid rgba(251,255,18,.7);
+  background: transparent;
+  color: var(--lemon);
+  font-size: 8px;
+  letter-spacing: .07em;
+  font-weight: 900;
+  cursor: pointer;
+  padding: 9px;
+}
+.chain-wallet-row > button:hover { background: var(--lemon); color: var(--night); }
+.wallet-pill:focus-visible, .wallet-primary:focus-visible, .wallet-secondary:focus-visible, .chain-wallet-row button:focus-visible {
+  outline: 2px solid var(--rose); outline-offset: 3px;
+}
+@media (max-width: 550px) {
+  .wallet-dock { right: 10px; bottom: 10px; width: min(300px, calc(100vw - 20px)); }
+  .wallet-pill { min-height: 37px; padding: 9px 11px; font-size: 8px; }
+  .wallet-panel { max-height: 58vh; }
+  .chain-wallet-row { grid-template-columns: 1fr; }
+  .chain-wallet-row > strong, .chain-wallet-row > button { grid-column: 1; grid-row: auto; }
+}
