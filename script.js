@@ -1852,6 +1852,21 @@ document.addEventListener("keydown", event => {
   }
 });
 
+
+/* Direct navigation to the Proof of Presence demo from Home and Bounty Board. */
+$("[data-open-proof-demo]").forEach(button => {
+  button.addEventListener("click", () => {
+    const demoIndex = bounties.findIndex(bounty => bounty.id === "#B031");
+    showBountyDetail(demoIndex >= 0 ? demoIndex : 0);
+    window.setTimeout(() => {
+      const section = $("#chainPanelTitle");
+      if (section) {
+        section.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 540);
+  });
+});
+
 /* =====================================================
    INIT
 ===================================================== */
