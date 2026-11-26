@@ -5830,3 +5830,71 @@ img {
   .chain-wallet-row { grid-template-columns: 1fr; }
   .chain-wallet-row > strong, .chain-wallet-row > button { grid-column: 1; grid-row: auto; }
 }
+
+
+/* FEATURED BLOCKCHAIN PATH – direct entry from landing page and bounty board */
+.home-proof-demo-cta {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 8px;
+  border: 1px solid var(--lemon);
+  background: rgba(251,255,18,.075);
+  padding: 13px 15px;
+  margin: 23px 0 0;
+  color: var(--white);
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease;
+}
+.home-proof-demo-cta:hover,
+.home-proof-demo-cta:focus-visible {
+  background: var(--lemon);
+  color: var(--night);
+}
+.home-proof-demo-kicker {
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .13em;
+  color: var(--rose);
+}
+.home-proof-demo-cta strong {
+  font-size: clamp(13px,1.6vw,18px);
+  line-height: 1.2;
+  font-weight: 900;
+  letter-spacing: -.02em;
+}
+.home-proof-demo-cta strong span { float: right; font-size: 22px; }
+.home-proof-demo-cta small {
+  font-size: 9px;
+  line-height: 1.4;
+  font-weight: 800;
+  letter-spacing: .06em;
+  color: #bfc7b3;
+}
+.home-proof-demo-cta:hover small, .home-proof-demo-cta:focus-visible small { color: #3e4336; }
+.bounty-proof-demo-cta {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0 16px;
+  padding: 12px 14px;
+  color: var(--night);
+  background: var(--lemon);
+  border: 1px solid var(--lemon);
+  font-size: 9px;
+  line-height: 1.5;
+  font-weight: 900;
+  letter-spacing: .065em;
+  text-align: left;
+  cursor: pointer;
+}
+.bounty-proof-demo-cta span { font-size: 18px; }
+.bounty-proof-demo-cta:hover,
+.bounty-proof-demo-cta:focus-visible { color: var(--night); background: var(--rose); border-color: var(--rose); }
+@media (max-width: 650px) {
+  .home-proof-demo-cta { margin-top: 16px; padding: 12px; }
+  .home-proof-demo-cta small { font-size: 8px; }
+}
