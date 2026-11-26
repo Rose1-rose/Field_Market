@@ -520,6 +520,11 @@
             <span class="chain-demo-tag">DEMO</span>
           </div>
           <p class="chain-explainer">A payment can be recorded. The moment still needs a witness.</p>
+          <div class="chain-wallet-row" aria-label="Optional MetaMask connection">
+            <span>LIVE WALLET / VIEW ONLY</span>
+            <strong id="chainWalletStatus">NOT CONNECTED</strong>
+            <button type="button" id="chainWalletConnectButton">CONNECT METAMASK ↗</button>
+          </div>
           <div class="chain-simple-steps" aria-label="Bounty payment and verification progress">
             <div class="chain-step"><span>01 / FUNDS</span><strong id="chainStepEscrow">Reserved</strong></div>
             <div class="chain-step"><span>02 / PROOF</span><strong id="chainStepProof">Waiting</strong></div>
@@ -534,13 +539,13 @@
               <div class="chain-stat"><span>PHOTO FINGERPRINT</span><strong class="chain-hash" id="chainProofHash">NOT SUBMITTED</strong></div>
               <div class="chain-stat"><span>PERSON REVIEWING</span><strong id="chainHumanState">AWAITING PROOF</strong></div>
               <div class="chain-stat"><span>PAYMENT RECORD</span><strong id="chainReceipt">NOT ISSUED</strong></div>
-              <div class="chain-stat"><span>LIVE BLOCKCHAIN</span><strong>NOT CONNECTED</strong></div>
+              <div class="chain-stat"><span>ON-CHAIN SETTLEMENT</span><strong>NOT ENABLED</strong></div>
             </div>
             <div class="chain-history">
               <span>DEMO RECORD HISTORY</span>
               <ol id="chainEventLog"></ol>
             </div>
-            <p class="chain-caveat">Concept prototype only. No real money, blockchain transactions or wallet connection. File fingerprints are calculated locally and cannot verify real-world presence.</p>
+            <p class="chain-caveat">Concept prototype only. MetaMask access shows your account and network, but no real money moves and no blockchain transactions occur. File fingerprints are calculated locally and cannot verify real-world presence.</p>
           </details>
         </section>
 
@@ -963,6 +968,32 @@
   </section>
 
 
+  <!-- Optional, read-only MetaMask connection: never used to authorize payouts. -->
+  <aside class="wallet-dock" id="walletDock" aria-label="MetaMask wallet connection">
+    <button class="wallet-pill" id="walletToggleButton" type="button" aria-expanded="false" aria-controls="walletPanel">
+      <span class="wallet-pill-mark" aria-hidden="true">◇</span>
+      <span id="walletPillText">CONNECT METAMASK</span>
+      <span class="wallet-pill-dot" aria-hidden="true"></span>
+    </button>
+    <section class="wallet-panel hidden" id="walletPanel" aria-label="MetaMask connection details">
+      <div class="wallet-panel-heading">
+        <span>FIELD MARKET / WALLET ACCESS</span>
+        <strong>READ-ONLY CONNECTION</strong>
+      </div>
+      <div class="wallet-meta-row">
+        <span>ACCOUNT</span>
+        <strong id="walletAddress">NOT CONNECTED</strong>
+      </div>
+      <div class="wallet-meta-row">
+        <span>NETWORK</span>
+        <strong id="walletNetwork">—</strong>
+      </div>
+      <button class="wallet-primary" id="walletConnectButton" type="button">CONNECT METAMASK</button>
+      <button class="wallet-secondary hidden" id="walletDisconnectButton" type="button">DISCONNECT FROM THIS PAGE</button>
+      <p id="walletFeedback" class="wallet-feedback" role="status" aria-live="polite">Connecting a wallet only displays your address and network. No real payments or blockchain transactions are made.</p>
+    </section>
+  </aside>
+
   <div class="page-transition" id="pageTransition" aria-hidden="true">
     <div class="transition-top">
       <span>FIELD MARKET / ROUTING</span>
@@ -973,5 +1004,6 @@
   </div>
 
   <script src="script.js?v=simplified-proof-v2"></script>
+  <script src="wallet.js?v=metamask-connect-v1"></script>
 </body>
 </html>
