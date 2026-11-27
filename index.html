@@ -8,10 +8,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=proof-entry-wallet-v3">
+  <link rel="stylesheet" href="style.css?v=ui-cleanup-v5">
 </head>
 
-<body>
+<body data-active-page="home">
 
   <!-- =====================================================
        HOME
@@ -21,76 +21,29 @@
     <header class="brand-page-header">
       <div class="site-mark">FIELD MARKET<sup>®</sup></div>
 
-      <nav class="home-nav">
-        <button type="button" data-route="market">MARKET</button>
-        <button type="button" data-route="bounties">BOUNTIES</button>
-        <button type="button" data-route="postBounty">POST A BOUNTY</button>
-        <button type="button" data-route="discussion">DISCUSSION</button>
-      </nav>
 
-      <div class="site-code">FIELD MARKET / NYC</div>
     </header>
 
     <div class="brand-page-main">
       <div class="brand-copy">
         <div class="section-code">A MARKETPLACE FOR PHYSICAL PRESENCE</div>
-        <div class="home-type-line" id="homeTypeLine" data-text="READING THE CITY SURFACE..."></div>
-
-        <h1>
-          <span class="hero-field">FIELD</span><br>
-          <span class="hero-market">MARKET.</span>
-        </h1>
-
-        <h2>COLLECT THE CITY.<br>REQUEST THE MOMENT.</h2>
-
-        <p>
-          Existing field records can be collected. New moments can be commissioned
-          through bounties that require someone to physically go, do, document,
-          and verify.
-        </p>
-
-        <button class="home-proof-demo-cta" type="button" data-open-proof-demo>
-          <span class="home-proof-demo-kicker">05 / BLOCKCHAIN CONCEPT + METAMASK</span>
-          <strong>EXPLORE PROOF OF PRESENCE <span aria-hidden="true">↗</span></strong>
-          <small>OPEN THE BOUNTY PROTOTYPE / CONNECT YOUR WALLET</small>
-        </button>
-
-        <div class="home-entry-label">
-          <span>ENTER FIELD MARKET</span>
-          <span>SELECT A MODE ↓</span>
-        </div>
-
-        <div class="home-action-grid">
+        <h1><span class="hero-field">FIELD</span><br><span class="hero-market">MARKET.</span></h1>
+        <h2>COLLECT THE CITY. REQUEST THE MOMENT.</h2>
+        <p>Existing field records can be collected. New moments can be commissioned through bounties that require someone to physically go, do, document, and verify.</p>
+        <div class="home-action-grid" aria-label="Explore Field Market">
           <button class="home-action" type="button" data-route="market">
-            <span>01</span>
-            <strong>LIVE MARKET</strong>
-            <small>FOUND / BROWSE + COLLECT RECORDS</small>
-            <b>→</b>
+            <strong>LIVE MARKET</strong><small>Browse collected field records</small><b aria-hidden="true">↗</b>
           </button>
-
           <button class="home-action" type="button" data-route="bounties">
-            <span>02</span>
-            <strong>BOUNTIES</strong>
-            <small>WANTED / REQUEST WHAT IS MISSING</small>
-            <b>→</b>
-          </button>
-
-          <button class="home-action" type="button" data-route="postBounty">
-            <span>03</span>
-            <strong>POST A BOUNTY</strong>
-            <small>COMMISSION A NEW FIELD RECORD</small>
-            <b>→</b>
-          </button>
-
-          <button class="home-action" type="button" data-route="discussion">
-            <span>04</span>
-            <strong>LIVE DISCUSSION</strong>
-            <small>MARKET ITEMS + BOUNTIES</small>
-            <b>→</b>
+            <strong>BOUNTIES</strong><small>Request a moment and verify the proof</small><b aria-hidden="true">↗</b>
           </button>
         </div>
+        <div class="home-secondary-actions">
+          <button type="button" data-route="postBounty">POST A BOUNTY <span aria-hidden="true">↗</span></button>
+          <button type="button" data-route="discussion">DISCUSSION <span aria-hidden="true">↗</span></button>
+        </div>
+        <button class="home-proof-demo-link" type="button" data-open-proof-demo>PROOF OF PRESENCE DEMO <span aria-hidden="true">↗</span></button>
       </div>
-
       <div class="brand-visual">
         <div class="home-visual-city" aria-hidden="true"></div>
         <div class="home-visual-poster" aria-hidden="true"></div>
@@ -140,7 +93,6 @@
 
       <div class="market-logo">
         <div>FIELD<br>MARKET<sup>®</sup></div>
-        <small>FOUND RECORDS / FIELD NETWORK</small>
       </div>
 
       <div class="header-actions">
@@ -298,7 +250,6 @@
 
     <div class="sell-record-layout">
       <div class="sell-record-intro">
-        <div class="tiny-label">FOUND / CONTRIBUTE TO THE MARKET</div>
         <h1>LIST A<br>FIELD RECORD.</h1>
 
         <p>
@@ -405,7 +356,6 @@
 
     <section class="bounty-hero">
       <div>
-        <div class="tiny-label">WANTED / PHYSICAL TASKS</div>
         <h1>REQUEST WHAT<br>HAS NOT BEEN FOUND.</h1>
       </div>
 
@@ -415,9 +365,8 @@
           requested place, completes the task, and returns with proof.
         </p>
 
-        <p class="chain-board-note">Choose an open request, submit a photo, and approve the result. <strong>Blockchain features are simulated.</strong></p>
         <button class="bounty-proof-demo-cta" type="button" data-open-proof-demo>
-          EXPLORE BLOCKCHAIN + METAMASK DEMO <span aria-hidden="true">↗</span>
+          SEE PROOF OF PRESENCE DEMO <span aria-hidden="true">↗</span>
         </button>
         <div class="bounty-board-counts">
           <div><span>OPEN</span><strong id="openCount">00</strong></div>
@@ -523,14 +472,13 @@
         <section class="chain-panel" aria-labelledby="chainPanelTitle">
           <div class="chain-panel-header">
             <div>
-              <span class="chain-kicker">FIELD MARKET / BLOCKCHAIN CONCEPT</span>
               <h2 id="chainPanelTitle">PROOF OF PRESENCE</h2>
             </div>
             <span class="chain-demo-tag">DEMO</span>
           </div>
           <p class="chain-explainer">A payment can be recorded. The moment still needs a witness.</p>
           <div class="chain-wallet-row" aria-label="Optional MetaMask connection">
-            <span>LIVE WALLET / VIEW ONLY</span>
+            <span>WALLET / OPTIONAL</span>
             <strong id="chainWalletStatus">NOT CONNECTED</strong>
             <button type="button" id="chainWalletConnectButton">CONNECT METAMASK ↗</button>
           </div>
@@ -540,7 +488,7 @@
             <div class="chain-step"><span>03 / PAYOUT</span><strong id="chainStepPayout">Pending</strong></div>
           </div>
           <details class="chain-details">
-            <summary>HOW DOES BLOCKCHAIN FIT? <span>VIEW DETAILS +</span></summary>
+            <summary>HOW VERIFICATION WORKS <span>DETAILS +</span></summary>
             <p class="chain-detail-explainer">A proposed smart contract holds the reward until a person approves the image. The contract can track that decision and payment, but cannot confirm the photographed event really happened.</p>
             <div class="chain-stats">
               <div class="chain-stat"><span>RESERVED DEMO REWARD</span><strong id="chainEscrowAmount">$0.00</strong></div>
@@ -986,8 +934,8 @@
     </button>
     <section class="wallet-panel hidden" id="walletPanel" aria-label="MetaMask connection details">
       <div class="wallet-panel-heading">
-        <span>FIELD MARKET / WALLET ACCESS</span>
-        <strong>READ-ONLY CONNECTION</strong>
+        <strong>METAMASK / WALLET STATUS</strong>
+        <button id="walletCloseButton" class="wallet-close-button" type="button" aria-label="Close wallet panel">×</button>
       </div>
       <div class="wallet-meta-row">
         <span>ACCOUNT</span>
@@ -1012,7 +960,7 @@
     <div class="transition-label" id="transitionLabel">LIVE MARKET</div>
   </div>
 
-  <script src="script.js?v=proof-entry-fixed-v4"></script>
-  <script src="wallet.js?v=metamask-connect-v1"></script>
+  <script src="script.js?v=ui-cleanup-v5"></script>
+  <script src="wallet.js?v=ui-cleanup-v5"></script>
 </body>
 </html>
