@@ -60,6 +60,7 @@
   }
   function setExpanded(open) {
     panel.classList.toggle("hidden", !open);
+    walletDock.classList.toggle("is-panel-open", open);
     toggle.setAttribute("aria-expanded", String(open));
   }
   function render() {
