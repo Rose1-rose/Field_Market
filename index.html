@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=ui-cleanup-v5">
+  <link rel="stylesheet" href="style.css?v=essay-ux-v7">
 </head>
 
 <body data-active-page="home">
@@ -29,20 +29,20 @@
         <div class="section-code">A MARKETPLACE FOR PHYSICAL PRESENCE</div>
         <h1><span class="hero-field">FIELD</span><br><span class="hero-market">MARKET.</span></h1>
         <h2>COLLECT THE CITY. REQUEST THE MOMENT.</h2>
-        <p>Existing field records can be collected. New moments can be commissioned through bounties that require someone to physically go, do, document, and submit evidence.</p>
+        <p>Collect moments from places you cannot be. Buy a record already captured, or commission someone to visit a place on your behalf.</p>
         <div class="home-action-grid" aria-label="Explore Field Market">
           <button class="home-action" type="button" data-route="market">
-            <strong>LIVE MARKET</strong><small>Browse collected field records</small><b aria-hidden="true">↗</b>
+            <strong>LIVE MARKET</strong><small>Buy a captured moment + receive a physical Field Stamp.</small><b aria-hidden="true">↗</b>
           </button>
           <button class="home-action" type="button" data-route="bounties">
-            <strong>BOUNTIES</strong><small>Request a moment and review the evidence</small><b aria-hidden="true">↗</b>
+            <strong>BOUNTIES</strong><small>Pay a runner to capture a new moment for you.</small><b aria-hidden="true">↗</b>
           </button>
         </div>
         <div class="home-secondary-actions">
           <button type="button" data-route="postBounty">POST A BOUNTY <span aria-hidden="true">↗</span></button>
           <button type="button" data-route="discussion">DISCUSSION <span aria-hidden="true">↗</span></button>
         </div>
-        <button class="home-proof-demo-link" type="button" data-open-proof-demo>PROOF OF PRESENCE DEMO <span aria-hidden="true">↗</span></button>
+        <button class="home-proof-demo-link" type="button" data-open-proof-demo>TRY A $12 BOUNTY / HOW IT WORKS <span aria-hidden="true">↗</span></button>
       </div>
       <div class="brand-visual">
         <div class="home-visual-city" aria-hidden="true"></div>
@@ -65,7 +65,7 @@
 
           <div class="drop-card-bottom">
             <span id="homeStatusFooter">FIELD MARKET / NYC</span>
-            <span class="drop-edition" id="homeStatusEdition">COLLECT / REQUEST / VERIFY</span>
+            <span class="drop-edition" id="homeStatusEdition">COLLECT / REQUEST / REVIEW</span>
           </div>
         </div>
       </div>
@@ -75,7 +75,7 @@
       <span>COLLECT</span><span>→</span>
       <span>REQUEST</span><span>→</span>
       <span>GO</span><span>→</span>
-      <span>PROVE</span><span>→</span>
+      <span>REVIEW</span><span>→</span>
       <span>FULFILL</span>
     </footer>
   </section>
@@ -477,19 +477,20 @@
             <span class="chain-demo-tag">DEMO</span>
           </div>
           <p class="chain-explainer">A payment can be recorded. The moment still needs a witness.</p>
-          <p class="chain-detail-explainer">Interactive simulation: play the runner, requester, and second reviewer as the task progresses. No actual users, contracts, or payments are connected.</p>
+          <p class="chain-demo-note">SIMULATION ONLY · NO REAL PAYMENTS OR ON-CHAIN RECORDS</p>
+          <div class="chain-simple-steps" aria-label="Bounty payment and verification progress">
+            <div class="chain-step"><span>01 / FUNDS</span><small>Is the reward secured?</small><strong id="chainStepEscrow">Reserved</strong></div>
+            <div class="chain-step"><span>02 / PROOF</span><small>Who reviews the photo?</small><strong id="chainStepProof">Waiting</strong></div>
+            <div class="chain-step"><span>03 / PAYOUT</span><small>Has the runner been paid?</small><strong id="chainStepPayout">Pending</strong></div>
+          </div>
+          <details class="chain-details">
+            <summary>HOW VERIFICATION WORKS <span>DETAILS +</span></summary>
           <div class="chain-wallet-row" aria-label="Optional MetaMask connection">
             <span>WALLET / OPTIONAL</span>
             <strong id="chainWalletStatus">NOT CONNECTED</strong>
             <button type="button" id="chainWalletConnectButton">CONNECT METAMASK ↗</button>
           </div>
-          <div class="chain-simple-steps" aria-label="Bounty payment and verification progress">
-            <div class="chain-step"><span>01 / FUNDS</span><strong id="chainStepEscrow">Reserved</strong></div>
-            <div class="chain-step"><span>02 / PROOF</span><strong id="chainStepProof">Waiting</strong></div>
-            <div class="chain-step"><span>03 / PAYOUT</span><strong id="chainStepPayout">Pending</strong></div>
-          </div>
-          <details class="chain-details">
-            <summary>HOW VERIFICATION WORKS <span>DETAILS +</span></summary>
+
             <p class="chain-detail-explainer">The requester reserves the reward before a runner accepts. A human reviews the off-chain photo; approval triggers simulated settlement. A dispute keeps funds locked. SHA-256 identifies file contents, not where or when the image was captured or whether it was fabricated.</p>
             <div class="chain-stats">
               <div class="chain-stat"><span>RESERVED DEMO REWARD</span><strong id="chainEscrowAmount">$0.00</strong></div>
@@ -507,6 +508,12 @@
           </details>
         </section>
 
+        <div class="workflow-role" id="workflowRole" aria-live="polite" aria-atomic="true">
+          <span>INTERACTIVE DEMO / CURRENT ROLE</span>
+          <strong id="workflowRoleTitle">YOU ARE THE RUNNER</strong>
+          <p id="workflowRoleNext">Accept the task to begin.</p>
+          <button type="button" class="workflow-reset hidden" id="resetProofDemo">RESTART THIS $12 DEMO ↺</button>
+        </div>
         <div class="bounty-action-area" id="bountyActionArea">
           <button class="take-bounty-button" id="takeBountyButton" type="button">
             TAKE BOUNTY <span>→</span>
@@ -515,7 +522,7 @@
 
         <section class="mission-panel hidden" id="missionPanel">
           <div class="mission-panel-head">
-            <span>RUNNER FLOW</span>
+            <span>02 / RUNNER</span>
             <strong id="missionStateLabel">MISSION ACCEPTED</strong>
           </div>
 
@@ -544,7 +551,8 @@
             </div>
 
             <p>Choose a photo you have permission to share. Avoid exposing private information or identifiable bystanders without consent.</p>
-            <label><input type="checkbox" id="allowPublicProof"> Allow public display after human approval (optional).</label>
+            <label class="proof-consent"><input type="checkbox" id="allowPublicProof"> Allow public display after human approval (optional).</label>
+            <button class="sample-proof-button hidden" id="sampleProofButton" type="button">USE EXISTING SAMPLE PHOTO ↗</button>
             <p id="proofUploadStatus" role="status" aria-live="polite"></p>
             <button class="submit-proof-button" id="submitProofButton" type="button" disabled>
               SUBMIT PROOF →
@@ -554,14 +562,15 @@
 
         <section class="requester-review hidden" id="requesterReview">
           <div class="review-head">
-            <span>REQUESTER FLOW</span>
-            <strong>REVIEW SUBMITTED PROOF</strong>
+            <span>03 / REQUESTER</span>
+            <strong>DOES THIS PHOTO MATCH YOUR REQUEST?</strong>
           </div>
 
           <p>
             Demo role: requester. Compare the photo with WHAT, WHERE, WHEN and PROOF. Approval triggers a simulated payout but cannot establish that the event really happened.
           </p>
 
+          <p id="reviewSampleNote" class="sample-note hidden">EXISTING ARCHIVE PHOTO: the file can match the request visually, but it does not establish a new visit.</p>
           <div class="private-proof-preview hidden" id="privateProofPreview">
             <img id="privateProofImage" alt="Private submitted proof">
             <span>PRIVATE / WAITING FOR APPROVAL</span>
@@ -581,7 +590,7 @@
 
         <section class="chain-dispute hidden" id="chainDisputePanel">
           <div class="review-head">
-            <span>DISPUTE / CONCEPT PROTOTYPE</span>
+            <span>04 / SECOND REVIEWER (SIMULATED)</span>
             <strong>WHO DECIDES WHAT COUNTS AS PROOF?</strong>
           </div>
           <p>The reward remains locked. Demo role: second reviewer. Review the same evidence and rejection reason. No actual independent reviewer or arbitration is connected. Rules for final refunds and reviewer selection remain unresolved.</p>
@@ -599,6 +608,7 @@
             <span>BOUNTY FULFILLED</span>
             <strong id="paidLabel">$0.00 PAID</strong>
             <small>HUMAN APPROVED / SIMULATED PAYMENT COMPLETE</small>
+            <div class="settlement-reflection"><strong>BUT WAS THE RUNNER REALLY THERE?</strong><p>The simulated payment is recorded. Human approval and a file fingerprint cannot establish physical presence.</p></div>
           </div>
         </section>
       </div>
@@ -969,7 +979,7 @@
     <div class="transition-label" id="transitionLabel">LIVE MARKET</div>
   </div>
 
-  <script src="script.js?v=proof-workflow-v6"></script>
+  <script src="script.js?v=essay-ux-v7"></script>
   <script src="wallet.js?v=ui-cleanup-v5"></script>
 </body>
 </html>
