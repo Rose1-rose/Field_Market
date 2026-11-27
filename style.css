@@ -5898,3 +5898,269 @@ img {
   .home-proof-demo-cta { margin-top: 16px; padding: 12px; }
   .home-proof-demo-cta small { font-size: 8px; }
 }
+
+
+/* ============================================================
+   QUIETER UI / V5 — presentation hierarchy only
+   Keeps all market, bounty, verification and wallet behavior.
+   ============================================================ */
+.brand-page-header {
+  display:flex !important;
+  justify-content:flex-start;
+  align-items:center;
+  min-height:61px;
+  padding:16px clamp(18px,3vw,40px) !important;
+}
+.brand-page-main {
+  grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr) !important;
+  gap:clamp(20px,3vw,45px) !important;
+  padding:clamp(34px,4vw,58px) clamp(18px,3vw,45px) 34px !important;
+}
+.brand-page-main::before { opacity:.45; }
+.brand-copy { max-width:700px !important; }
+.brand-copy .section-code {
+  font-size:8px;
+  line-height:1.6;
+  letter-spacing:.1em;
+  margin-bottom:18px !important;
+}
+.brand-copy h1 {
+  font-size:clamp(54px,7vw,105px) !important;
+  line-height:.94 !important;
+  letter-spacing:-.052em !important;
+}
+.brand-copy h2 {
+  color:var(--rose);
+  font-size:clamp(14px,1.6vw,20px) !important;
+  line-height:1.35 !important;
+  letter-spacing:-.02em !important;
+  margin:24px 0 0 !important;
+}
+.brand-copy p {
+  max-width:520px;
+  margin:12px 0 0 !important;
+  color:rgba(245,245,239,.71) !important;
+  font-size:13px !important;
+  line-height:1.7 !important;
+}
+
+/* Two primary routes, calm and instantly scannable. */
+.home-action-grid {
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  width:100%;
+  gap:12px !important;
+  margin-top:28px !important;
+}
+.home-action {
+  position:relative;
+  display:flex !important;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  gap:8px;
+  min-height:116px !important;
+  padding:20px 18px !important;
+  background:#161b16 !important;
+  border:1px solid rgba(245,245,239,.34) !important;
+  color:var(--white) !important;
+  box-shadow:none !important;
+  transform:none !important;
+  text-align:left;
+}
+.home-action::before { height:3px !important; }
+.home-action strong {
+  color:var(--white) !important;
+  font-size:clamp(15px,1.55vw,19px) !important;
+  line-height:1.2 !important;
+}
+.home-action small {
+  color:rgba(245,245,239,.63) !important;
+  font-size:11px;
+  line-height:1.45;
+  opacity:1 !important;
+  letter-spacing:0;
+}
+.home-action b {
+  position:absolute;
+  right:13px;
+  top:13px;
+  width:auto !important;
+  height:auto !important;
+  font-size:20px !important;
+  color:var(--white) !important;
+  border:0 !important;
+}
+.home-action:hover,.home-action.is-previewing,.home-action:focus-visible {
+  transform:none !important;
+  box-shadow:inset 0 0 0 1px var(--lemon) !important;
+}
+.home-action:nth-child(1):hover,.home-action:nth-child(1).is-previewing {
+  background:#1e281b !important;
+  border-color:var(--lemon) !important;
+}
+.home-action:nth-child(2):hover,.home-action:nth-child(2).is-previewing {
+  background:#2a1c23 !important;
+  border-color:var(--rose) !important;
+}
+.home-action:hover strong,.home-action:hover small,.home-action:hover b,
+.home-action.is-previewing strong,.home-action.is-previewing small,.home-action.is-previewing b {
+  color:var(--white) !important;
+  border-color:transparent !important;
+}
+
+/* Secondary destinations are still visible without competing for focus. */
+.home-secondary-actions {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:7px 23px;
+  margin-top:15px;
+}
+.home-secondary-actions button,.home-proof-demo-link {
+  border:0;
+  background:transparent;
+  color:rgba(245,245,239,.77);
+  text-align:left;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.05em;
+  line-height:1.5;
+  padding:7px 0;
+  cursor:pointer;
+}
+.home-secondary-actions button span { color:var(--rose); margin-left:4px; }
+.home-secondary-actions button:hover,.home-secondary-actions button:focus-visible { color:var(--lemon); }
+.home-proof-demo-link {
+  display:flex;
+  width:min(390px,100%);
+  justify-content:space-between;
+  margin:13px 0 0;
+  padding:12px 0 0;
+  border-top:1px solid rgba(245,245,239,.15);
+  color:var(--grey);
+  font-size:9px;
+  font-weight:700;
+}
+.home-proof-demo-link span { color:var(--lemon); }
+.home-proof-demo-link:hover,.home-proof-demo-link:focus-visible { color:var(--white); }
+
+/* Preserve status preview, make it background context. */
+.brand-visual { min-height:450px !important; opacity:.83; }
+.drop-card {
+  width:min(350px,71%) !important;
+  height:360px !important;
+  right:6% !important;
+  box-shadow:7px 7px 0 rgba(0,0,0,.3) !important;
+}
+.drop-card-top,.drop-card-bottom { display:none !important; }
+.drop-card-number { font-size:clamp(78px,7vw,108px) !important; }
+.drop-card-title { font-size:clamp(16px,1.45vw,23px) !important; }
+.drop-card-price strong { font-size:25px !important; }
+.home-visual-poster { opacity:.55; }
+.brand-page-footer {
+  color:rgba(245,245,239,.35) !important;
+  border-top-color:rgba(245,245,239,.08) !important;
+}
+
+/* Remove ornamental metadata; preserve instructions and form labels. */
+.market-logo small,.product-header-center,.product-image-tag,.drop-footer {
+  display:none !important;
+}
+.bounty-hero .tiny-label { display:none !important; }
+.bounty-info-panel .product-topline > span:first-child { display:none !important; }
+
+/* Blockchain is a part of Bounties. Show it as a link, not a fifth main action. */
+.bounty-proof-demo-cta {
+  display:inline-flex;
+  width:auto;
+  max-width:100%;
+  margin:12px 0 14px;
+  padding:8px 0;
+  background:transparent;
+  border:0;
+  border-bottom:1px solid rgba(251,255,18,.45);
+  color:var(--lemon);
+  font-size:10px;
+  letter-spacing:.03em;
+  font-weight:800;
+}
+.bounty-proof-demo-cta:hover,.bounty-proof-demo-cta:focus-visible {
+  background:transparent; border-color:var(--rose); color:var(--rose);
+}
+.chain-panel { padding:18px !important; }
+.chain-panel h2 { font-size:clamp(16px,1.6vw,21px) !important; }
+.chain-explainer { font-size:11px !important; line-height:1.6 !important; }
+.chain-wallet-row {
+  padding:10px 0 !important;
+  margin:10px 0 13px !important;
+  background:transparent !important;
+  border:0 !important;
+  border-top:1px solid rgba(245,245,239,.13) !important;
+}
+.chain-wallet-row > span { font-size:9px !important; letter-spacing:.03em !important; }
+
+/* Wallet details only appear when requested from the Bounty verification panel. */
+.wallet-dock { display:none !important; }
+body[data-active-page="bountyDetail"] .wallet-dock.is-panel-open { display:block !important; }
+.wallet-pill { display:none !important; }
+.wallet-panel {
+  margin-top:0 !important;
+  border-color:rgba(245,245,239,.5);
+  box-shadow:4px 4px 0 rgba(0,0,0,.28);
+}
+.wallet-panel-heading {
+  flex-direction:row !important;
+  justify-content:space-between;
+  align-items:center;
+}
+.wallet-panel-heading strong { font-size:11px !important; color:var(--white) !important; }
+.wallet-close-button {
+  background:none;
+  border:0;
+  padding:0 4px;
+  color:var(--grey);
+  font-size:24px;
+  cursor:pointer;
+}
+.wallet-close-button:hover,.wallet-close-button:focus-visible { color:var(--lemon); }
+
+@media(max-width:1100px) {
+  .brand-page-main {
+    grid-template-columns:minmax(0,1fr) minmax(0,.8fr) !important;
+    gap:22px !important;
+  }
+  .brand-copy h1 { font-size:clamp(50px,7vw,91px) !important; }
+  .brand-visual { min-height:400px !important; }
+  .drop-card { height:337px !important; }
+}
+@media(max-width:760px) {
+  .brand-page-header { padding:16px 20px !important; }
+  .brand-page-main {
+    grid-template-columns:minmax(0,1fr) !important;
+    gap:0 !important;
+    padding:32px 20px 32px !important;
+  }
+  .brand-copy h1 { font-size:clamp(47px,12vw,80px) !important; }
+  .brand-copy h2 { font-size:14px !important; }
+  .home-action-grid { margin-top:22px !important; }
+  .home-action { min-height:104px !important; padding:17px 13px !important; }
+  .home-action strong { font-size:14px !important; }
+  .home-action small { font-size:10px; }
+  .brand-visual { min-height:270px !important; margin:25px 0 0; }
+  .drop-card {
+    width:49% !important;
+    min-width:170px !important;
+    height:248px !important;
+    right:9% !important;
+  }
+  .drop-card-number { font-size:58px !important; }
+  .drop-card-title { font-size:14px !important; }
+  .drop-card-price strong { font-size:17px !important; }
+}
+@media(max-width:440px) {
+  .home-action-grid { grid-template-columns:1fr !important; }
+  .home-action { min-height:85px !important; }
+  .brand-visual { min-height:215px !important; }
+  .drop-card { height:206px !important; }
+}
