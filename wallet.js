@@ -9,6 +9,7 @@
   const panel = byId("walletPanel");
   const connectButton = byId("walletConnectButton");
   const disconnectButton = byId("walletDisconnectButton");
+  const closeButton = byId("walletCloseButton");
   const bountyButton = byId("chainWalletConnectButton");
   const pillLabel = byId("walletPillText");
   const addressLabel = byId("walletAddress");
@@ -194,9 +195,10 @@
     render();
   });
   if (bountyButton) bountyButton.addEventListener("click", () => {
-    if (state.account) setExpanded(true);
+    if (state.account) setExpanded(panel.classList.contains("hidden"));
     else connectWallet();
   });
+  if (closeButton) closeButton.addEventListener("click", () => setExpanded(false));
   document.addEventListener("keydown", event => {
     if (event.key === "Escape" && !panel.classList.contains("hidden")) setExpanded(false);
   });
