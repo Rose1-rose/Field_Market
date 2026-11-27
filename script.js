@@ -335,6 +335,7 @@ let routeTimerB = null;
 function switchPageNow(name) {
   Object.values(pages).forEach(page => page.classList.add("hidden"));
   pages[name].classList.remove("hidden");
+  document.body.dataset.activePage = name;
 
   window.scrollTo(0, 0);
 
