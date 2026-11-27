@@ -244,7 +244,7 @@ let bounties = [
     where: "East Village, NYC",
     when: "Today / Before 8:00 PM",
     what: "Find the temporary poster described by the requester before it is removed or covered.",
-    proof: "One clear photo of the poster plus one wider photo showing the surrounding block.",
+    proof: "One clear photo showing the poster and surrounding block.",
     owner: "@mia",
     proofImage: "",
     pendingProofImage: "",
@@ -258,7 +258,7 @@ let bounties = [
     where: "Times Square, NYC",
     when: "11:57 PM–12:00 AM",
     what: "Go to Times Square during the specified screen event and document the display while it is actually happening.",
-    proof: "One photo or short video showing the screen and surrounding Times Square context.",
+    proof: "One photo showing the screen and surrounding Times Square context.",
     owner: "@screenwatch",
     proofImage: "",
     pendingProofImage: "",
@@ -293,6 +293,8 @@ let selectedIndex = 0;
 let currentProductIndex = 0;
 let currentBountyIndex = 0;
 let pendingProofDataUrl = "";
+let proofSelectionVersion = 0;
+let sampleProofFile = null;
 
 const pages = {
   home: document.querySelector("#brandPage"),
@@ -411,7 +413,7 @@ const homeStatusPresets = {
   bounties: () => {
     const open = bounties.filter(item => item.status === "OPEN").length;
     const active = bounties.filter(
-      item => item.status === "IN PROGRESS" || item.status === "WAITING APPROVAL" || item.status === "DISPUTED"
+      item => ["IN PROGRESS","WAITING APPROVAL","DISPUTED"].includes(item.status)
     ).length;
 
     return {
@@ -422,7 +424,7 @@ const homeStatusPresets = {
       label: "ACTIVE IN FIELD",
       value: String(active).padStart(2, "0"),
       footer: "FIELD MARKET / BOUNTIES",
-      edition: "TAKE / GO / PROVE / GET PAID"
+      edition: "TAKE / GO / REVIEW / GET PAID"
     };
   },
 
@@ -458,7 +460,7 @@ function getHomeDefaultPreset() {
     label: "BOUNTY BOARD",
     value: String(bounties.length).padStart(2, "0"),
     footer: "FIELD MARKET / NYC",
-    edition: "COLLECT / REQUEST / VERIFY"
+    edition: "COLLECT / REQUEST / REVIEW"
   };
 }
 
@@ -1170,17 +1172,17 @@ function ensureConceptBounty(bounty) {
 function logConcept(bounty, event) { ensureConceptBounty(bounty).events.push(event); }
 function renderConceptPanel(bounty) {
   const c = ensureConceptBounty(bounty);
-  $("#chainEscrowAmount").textContent = money(bounty.reward);
+  $("#chainEscrowAmount").textContent = money(bounty.status === "FULFILLED" ? 0 : bounty.reward);
   $("#chainEscrowState").textContent = c.escrow;
   $("#chainProofHash").textContent = c.hash;
   $("#chainHumanState").textContent = c.review;
   $("#chainReceipt").textContent = bounty.status === "FULFILLED" ? "DEMO SETTLEMENT / "+bounty.id : "NOT ISSUED";
-  $("#chainStepEscrow").textContent = bounty.status === "FULFILLED" ? "Released" : "Reserved";
-  $("#chainStepProof").textContent = bounty.status === "FULFILLED" ? "Approved" :
+  $("#chainStepEscrow").textContent = bounty.status === "FULFILLED" ? "Released" : "Reserved / "+money(bounty.reward);
+  $("#chainStepProof").textContent = bounty.status === "FULFILLED" ? "Human approved" :
     bounty.status === "DISPUTED" ? "Disputed" :
-    bounty.status === "WAITING APPROVAL" ? "In review" :
-    bounty.status === "IN PROGRESS" ? "To upload" : "Waiting";
-  $("#chainStepPayout").textContent = bounty.status === "FULFILLED" ? "Paid (demo)" : "Pending";
+    bounty.status === "WAITING APPROVAL" ? "Human review" :
+    bounty.status === "IN PROGRESS" ? "Awaiting photo" : "No photo yet";
+  $("#chainStepPayout").textContent = bounty.status === "FULFILLED" ? money(bounty.reward)+" paid (demo)" : bounty.status === "DISPUTED" ? "On hold" : "Pending";
   const log = $("#chainEventLog");
   log.replaceChildren();
   c.events.forEach((message,i) => {
@@ -1190,22 +1192,14 @@ function renderConceptPanel(bounty) {
     log.appendChild(li);
   });
 }
-async function computeConceptHash(bounty,file) {
-  const c = ensureConceptBounty(bounty);
-  if (!file || !window.crypto?.subtle) c.hash = "UNAVAILABLE / WEB CRYPTO REQUIRED";
-  else if(file.size > 30*1024*1024) c.hash = "FILE TOO LARGE FOR DEMO HASH";
-  else try {
-    const digest = await window.crypto.subtle.digest("SHA-256",await file.arrayBuffer());
-    const fingerprint = [...new Uint8Array(digest)].map(x=>x.toString(16).padStart(2,"0")).join("");
-    if(bounty.status === "WAITING APPROVAL" || bounty.status === "DISPUTED") {
-      c.hash = "SHA-256 "+fingerprint.slice(0,16)+"…";
-      logConcept(bounty,"LOCAL FILE FINGERPRINT COMPUTED / NOT ON CHAIN");
-    }
-  } catch(e) {c.hash = "HASH UNAVAILABLE";}
-  if(bounties[currentBountyIndex]===bounty) renderConceptPanel(bounty);
+async function computeConceptHash(file) {
+  if (!window.crypto?.subtle) throw Error("SHA-256 unavailable");
+  const digest = await window.crypto.subtle.digest("SHA-256", await file.arrayBuffer());
+  return [...new Uint8Array(digest)].map(x=>x.toString(16).padStart(2,"0")).join("");
 }
 function settleConcept(bounty,approval) {
-  if(bounty.status!=="WAITING APPROVAL" && bounty.status!=="DISPUTED") return;
+  if (!["WAITING APPROVAL","DISPUTED"].includes(bounty.status) || !bounty.pendingProofImage) return;
+  if (ensureConceptBounty(bounty).escrow !== "LOCKED (DEMO)" || !/^SHA-256 [a-f0-9]{64}$/.test(ensureConceptBounty(bounty).hash)) return;
   bounty.status = "FULFILLED";
   bounty.missionStage = 5;
   const c = ensureConceptBounty(bounty);
@@ -1215,7 +1209,7 @@ function settleConcept(bounty,approval) {
   logConcept(bounty,"SMART CONTRACT PAYOUT SIMULATED: "+money(bounty.reward));
   logConcept(bounty,"DEMO SETTLEMENT / ZERO ON-CHAIN TRANSACTIONS");
   if(bounty.pendingProofImage) {
-    bounty.proofImage = bounty.pendingProofImage;
+    bounty.proofImage = bounty.allowPublicProof ? bounty.pendingProofImage : "";
     bounty.pendingProofImage = "";
   }
   addDiscussionMessage({user:"SYSTEM",linkText:bounty.id,linkType:"bounty",linkId:bounty.id,linkIndex:currentBountyIndex,text:bounty.title+" approved — DEMO payout "+money(bounty.reward)+" (no real money)."});
@@ -1329,7 +1323,11 @@ function showBountyDetail(index) {
 }
 
 function cleanupTemporaryProof() {
+  proofSelectionVersion++;
+  sampleProofFile = null;
   pendingProofDataUrl = "";
+  $("#proofUploadStatus").textContent = "";
+  $("#allowPublicProof").checked = false;
 
   $("#bountyUpload").value = "";
   $("#proofPreview").classList.add("hidden");
@@ -1372,11 +1370,14 @@ function renderBountyMedia(bounty) {
     } else if (bounty.status === "IN PROGRESS") {
       $("#noImageStatus").textContent = "IN PROGRESS / NO PUBLIC IMAGE";
       $("#noImageMessage").textContent =
-        "A RUNNER IS CURRENTLY COMPLETING THIS TASK. THE RESULT APPEARS AFTER APPROVAL.";
+        "A RUNNER IS COMPLETING THIS TASK. THE PHOTO IS NOT PUBLIC DURING REVIEW.";
     } else if (bounty.status === "WAITING APPROVAL") {
       $("#noImageStatus").textContent = "WAITING APPROVAL / NO PUBLIC IMAGE";
       $("#noImageMessage").textContent =
-        "PROOF HAS BEEN SUBMITTED PRIVATELY. IT BECOMES PUBLIC ONLY AFTER APPROVAL.";
+        "PHOTO SUBMITTED FOR HUMAN REVIEW. PUBLIC DISPLAY REQUIRES OPT-IN AND APPROVAL.";
+     } else if (bounty.status === "FULFILLED") {
+      $("#noImageStatus").textContent = "FULFILLED / PRIVATE RECORD";
+      $("#noImageMessage").textContent = "HUMAN APPROVED. PUBLIC DISPLAY WAS NOT AUTHORIZED.";
     } else if (bounty.status === "DISPUTED") {
       $("#noImageStatus").textContent = "DISPUTED / HUMAN REVIEW";
       $("#noImageMessage").textContent =
@@ -1404,10 +1405,19 @@ function renderBountyDetail() {
       ? "var(--rose)"
       : "var(--night)";
 
-  $("#bountyRoleLabel").textContent =
-    bounty.owner === "YOU"
-      ? "YOUR BOUNTY / REQUESTER VIEW"
-      : "BOUNTY REQUEST";
+  const roles = {
+    "OPEN": ["RUNNER / TASK AVAILABLE", "YOU ARE THE RUNNER", "The requester has already reserved the reward. Accept the task."],
+    "IN PROGRESS": ["RUNNER / IN PROGRESS", "YOU ARE THE RUNNER", "Visit the location and submit a photo. For the $12 demo, you may use the existing sample instead."],
+    "WAITING APPROVAL": ["REQUESTER / HUMAN REVIEW", "YOU ARE NOW THE REQUESTER", "Role switch: compare the evidence with the task. Approve or reject it."],
+    "DISPUTED": ["SECOND REVIEW / FUNDS LOCKED", "YOU ARE NOW THE SECOND REVIEWER", "Role switch: examine the photo and rejection reason. Decide whether to approve or request new evidence."],
+    "FULFILLED": ["COMPLETED / DEMO PAYOUT", "DEMO TRANSACTION COMPLETE", "A human approved the evidence. This does not prove the real-world event."]
+  };
+  const role = roles[bounty.status] || roles.OPEN;
+  $("#bountyRoleLabel").textContent = role[0];
+  $("#workflowRoleTitle").textContent = role[1];
+  $("#workflowRoleNext").textContent = role[2];
+  $("#resetProofDemo").classList.toggle("hidden", bounty.id !== "#B-DEMO");
+  $("#sampleProofButton").classList.toggle("hidden", bounty.id !== "#B-DEMO");
 
   renderBountyMedia(bounty);
   renderBountyFlow(bounty);
@@ -1426,7 +1436,10 @@ function renderBountyFlow(bounty) {
   $("#privateProofPreview").classList.add("hidden");
   $("#privateProofImage").removeAttribute("src");
   $("#uploadZone").classList.add("hidden");
-
+  $("#disputeProofImage").removeAttribute("src");
+  $("#disputeReasonDisplay").textContent = "";
+  $("#reviewReason").value = "";
+  $("#reviewFeedback").textContent = "";
   if (bounty.status === "OPEN") {
     takeButton.classList.remove("hidden");
     takeButton.innerHTML = bounty.owner === "YOU"
@@ -1441,10 +1454,13 @@ function renderBountyFlow(bounty) {
   }
   if (bounty.status === "DISPUTED") {
     disputePanel.classList.remove("hidden");
+    if (bounty.pendingProofImage) $("#disputeProofImage").src = bounty.pendingProofImage;
+    $("#disputeReasonDisplay").textContent = bounty.disputeReason || "Another review requested.";
     return;
   }
   if (bounty.status === "WAITING APPROVAL") {
     requesterReview.classList.remove("hidden");
+    $("#reviewSampleNote").classList.toggle("hidden", !bounty.usedArchiveSample);
     if (bounty.pendingProofImage) {
       $("#privateProofPreview").classList.remove("hidden");
       $("#privateProofImage").src = bounty.pendingProofImage;
@@ -1461,7 +1477,7 @@ function renderBountyFlow(bounty) {
 $("#takeBountyButton").addEventListener("click", () => {
   const bounty = bounties[currentBountyIndex];
 
-  if (ensureConceptBounty(bounty).escrow !== "LOCKED (DEMO)") return;
+  if (bounty.status !== "OPEN" || ensureConceptBounty(bounty).escrow !== "LOCKED (DEMO)") return;
   bounty.status = "IN PROGRESS";
   bounty.missionStage = 1;
   logConcept(bounty, "RUNNER ACCEPTED / DEMO FUNDS REMAIN RESERVED");
@@ -1484,74 +1500,109 @@ $("#takeBountyButton").addEventListener("click", () => {
 });
 
 $("#bountyUpload").addEventListener("change", event => {
-  const file = event.target.files?.[0];
-
-  if (!file) {
-    $("#submitProofButton").disabled = true;
-    $("#proofPreview").classList.add("hidden");
+  sampleProofFile = null;
+  const file = event.target.files?.[0], version = ++proofSelectionVersion;
+  pendingProofDataUrl = "";
+  $("#submitProofButton").disabled = true;
+  $("#proofPreview").classList.add("hidden");
+  $("#proofPreviewImage").removeAttribute("src");
+  $("#proofUploadStatus").textContent = "";
+  if (!file) return;
+  if (!file.type.startsWith("image/") || file.size > 30*1024*1024) {
+    $("#proofUploadStatus").textContent = "Choose a photo under 30 MB.";
     return;
   }
-
-  $("#submitProofButton").disabled = false;
-
-  if (file.type.startsWith("image/")) {
-    const reader = new FileReader();
-
-    reader.addEventListener("load", () => {
+  const reader = new FileReader();
+  reader.onload = () => {
+    if (version !== proofSelectionVersion) return;
+    const img = new Image();
+    img.onload = () => {
+      if (version !== proofSelectionVersion) return;
       pendingProofDataUrl = reader.result;
-      $("#proofPreviewImage").src = pendingProofDataUrl;
+      $("#proofPreviewImage").src = reader.result;
       $("#proofPreview").classList.remove("hidden");
-    });
-
-    reader.readAsDataURL(file);
-  } else {
-    pendingProofDataUrl = "";
-    $("#proofPreview").classList.add("hidden");
+      $("#submitProofButton").disabled = false;
+    };
+    img.onerror = () => { if (version === proofSelectionVersion) $("#proofUploadStatus").textContent = "Unable to read this photo."; };
+    img.src = reader.result;
+  };
+  reader.onerror = () => { if (version === proofSelectionVersion) $("#proofUploadStatus").textContent = "Unable to read this file."; };
+  reader.readAsDataURL(file);
+});
+$("#sampleProofButton").addEventListener("click", async () => {
+  const bounty = bounties[currentBountyIndex];
+  if (bounty.id !== "#B-DEMO" || bounty.status !== "IN PROGRESS") return;
+  cleanupTemporaryProof();
+  const version = proofSelectionVersion;
+  $("#proofUploadStatus").textContent = "Loading an existing archive photo — not a new visit.";
+  try {
+    const response = await fetch("assets/proof_times_square.png");
+    if (!response.ok) throw Error("Sample unavailable");
+    const blob = await response.blob();
+    if (version !== proofSelectionVersion || bounties[currentBountyIndex] !== bounty) return;
+    sampleProofFile = blob;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (version !== proofSelectionVersion) return;
+      pendingProofDataUrl = reader.result;
+      $("#proofPreviewImage").src = reader.result;
+      $("#proofPreview").classList.remove("hidden");
+      $("#submitProofButton").disabled = false;
+      $("#proofUploadStatus").textContent = "EXISTING SAMPLE / This photo is not evidence of a new visit. Submit it to explore the human-review decision.";
+    };
+    reader.onerror = () => { if(version === proofSelectionVersion) $("#proofUploadStatus").textContent = "Unable to load the sample. Try again or choose a photo."; };
+    reader.readAsDataURL(blob);
+  } catch (_) {
+    if(version === proofSelectionVersion) $("#proofUploadStatus").textContent = "Sample unavailable. Try again or choose a photo.";
   }
 });
-
-$("#submitProofButton").addEventListener("click", () => {
-  const bounty = bounties[currentBountyIndex];
-
-  if (!$("#bountyUpload").files?.length) return;
-
+$("#submitProofButton").addEventListener("click", async () => {
+  const bounty = bounties[currentBountyIndex], file = sampleProofFile || $("#bountyUpload").files?.[0], image = pendingProofDataUrl, version = proofSelectionVersion;
+  if (bounty.status !== "IN PROGRESS" || !file || !image) return;
+  $("#submitProofButton").disabled = true;
+  $("#proofUploadStatus").textContent = "Computing local SHA-256 fingerprint…";
+  let hash;
+  try { hash = await computeConceptHash(file); }
+  catch (_) {
+    if (version === proofSelectionVersion) {
+      $("#proofUploadStatus").textContent = "Fingerprint unavailable. Retry in a secure browser.";
+      $("#submitProofButton").disabled = false;
+    }
+    return;
+  }
+  if (version !== proofSelectionVersion || bounties[currentBountyIndex] !== bounty || bounty.status !== "IN PROGRESS") return;
+  bounty.pendingProofImage = image;
+  bounty.usedArchiveSample = Boolean(sampleProofFile);
+  bounty.allowPublicProof = $("#allowPublicProof").checked;
   bounty.status = "WAITING APPROVAL";
   bounty.missionStage = 4;
-  ensureConceptBounty(bounty).review = "AWAITING HUMAN APPROVAL";
-  logConcept(bounty, "PROOF SUBMITTED / FILE HELD OFF CHAIN");
-  computeConceptHash(bounty, $("#bountyUpload").files[0]);
-
-  if (pendingProofDataUrl) {
-    bounty.pendingProofImage = pendingProofDataUrl;
-  }
-
-  addDiscussionMessage({
-    user: "SYSTEM",
-    linkText: bounty.id,
-    linkType: "bounty",
-    linkId: bounty.id,
-    linkIndex: currentBountyIndex,
-    text: `Proof was submitted for ${bounty.title}.`
-  });
-
-  renderBountyDetail();
-  renderBounties();
+  const c = ensureConceptBounty(bounty);
+  c.hash = "SHA-256 "+hash;
+  c.review = "AWAITING REQUESTER REVIEW";
+  logConcept(bounty, sampleProofFile ? "EXISTING ARCHIVE PHOTO SUBMITTED / NO NEW VISIT CLAIMED" : "PHOTO SUBMITTED / BROWSER-LOCAL, OFF CHAIN");
+  logConcept(bounty, "LOCAL SHA-256: "+hash);
+  logConcept(bounty, "PUBLIC DISPLAY: "+(bounty.allowPublicProof ? "OPTED IN AFTER APPROVAL" : "NOT AUTHORIZED"));
+  cleanupTemporaryProof();
+  addDiscussionMessage({user:"SYSTEM",linkText:bounty.id,linkType:"bounty",linkId:bounty.id,linkIndex:currentBountyIndex,text:"Photo submitted for human review: "+bounty.title+"."});
+  renderBountyDetail(); renderBounties();
 });
-
 $("#approveProofButton").addEventListener("click", () => {
-  settleConcept(bounties[currentBountyIndex], "REQUESTER APPROVED");
+  if (bounties[currentBountyIndex].status === "WAITING APPROVAL") settleConcept(bounties[currentBountyIndex], "REQUESTER APPROVED");
 });
 $("#openDisputeButton").addEventListener("click", () => {
   const bounty = bounties[currentBountyIndex];
   if (bounty.status !== "WAITING APPROVAL") return;
+  const reason = $("#reviewReason").value.trim();
+  if (!reason) { $("#reviewFeedback").textContent = "Explain why the evidence is insufficient."; return; }
+  bounty.disputeReason = reason;
   bounty.status = "DISPUTED";
   ensureConceptBounty(bounty).review = "DISPUTED / REVIEW PENDING";
-  logConcept(bounty, "REQUESTER DISPUTED PROOF / ESCROW STILL LOCKED");
+  logConcept(bounty, "REQUESTER REJECTED / REASON: "+reason+" / ESCROW STILL LOCKED");
   renderBountyDetail();
   renderBounties();
 });
 $("#disputeApproveButton").addEventListener("click", () => {
-  settleConcept(bounties[currentBountyIndex], "SIMULATED INDEPENDENT REVIEW APPROVED");
+  if (bounties[currentBountyIndex].status === "DISPUTED") settleConcept(bounties[currentBountyIndex], "SIMULATED INDEPENDENT REVIEW APPROVED");
 });
 $("#disputeRetryButton").addEventListener("click", () => {
   const bounty = bounties[currentBountyIndex];
@@ -1559,6 +1610,8 @@ $("#disputeRetryButton").addEventListener("click", () => {
   bounty.status = "IN PROGRESS";
   bounty.missionStage = 1;
   bounty.pendingProofImage = "";
+  bounty.usedArchiveSample = false;
+  bounty.allowPublicProof = false;
   const concept = ensureConceptBounty(bounty);
   concept.hash = "AWAITING REPLACEMENT FILE";
   concept.review = "NEW PROOF REQUESTED";
@@ -1645,7 +1698,7 @@ let discussionMessages = [
     linkText: "#B031",
     linkType: "bounty",
     linkId: "#B031",
-    text: "Times Square check-in fulfilled — proof verified."
+    text: "Times Square check-in fulfilled — photo approved by a human."
   },
   {
     user: "mia",
@@ -1854,13 +1907,32 @@ document.addEventListener("keydown", event => {
 });
 
 
+$("#resetProofDemo").addEventListener("click", () => {
+  const bounty = bounties[currentBountyIndex];
+  if (bounty.id !== "#B-DEMO") return;
+  Object.assign(bounty, {status:"OPEN",missionStage:0,runner:"",proofImage:"",pendingProofImage:"",usedArchiveSample:false,allowPublicProof:false,disputeReason:"",
+    concept:{escrow:"LOCKED (DEMO)",review:"AWAITING PROOF",hash:"NOT SUBMITTED",events:["DEMO REQUEST CREATED","DEMO ESCROW RESERVED: $12.00 / NO REAL FUNDS"]}});
+  cleanupTemporaryProof();
+  renderBountyDetail();
+  renderBounties();
+});
 /* Direct navigation to the Proof of Presence demo from Home and Bounty Board. */
 $$("[data-open-proof-demo]").forEach(button => {
   button.addEventListener("click", () => {
-    const demoIndex = bounties.findIndex(bounty => bounty.id === "#B031");
-    showBountyDetail(demoIndex >= 0 ? demoIndex : 0);
+    let demoIndex = bounties.findIndex(bounty => bounty.id === "#B-DEMO");
+    if (demoIndex < 0) {
+      const sample = bounties.find(bounty => bounty.id === "#B031");
+      bounties.push({id:"#B-DEMO",title:"TIMES SQUARE / TRY THE WORKFLOW",reward:12,
+        where:sample.where,when:"Demo / scheduled billboard display",what:sample.what,proof:sample.proof,
+        owner:"DEMO REQUESTER",proofImage:"",pendingProofImage:"",status:"OPEN",missionStage:0,
+        concept:{escrow:"LOCKED (DEMO)",review:"AWAITING PROOF",hash:"NOT SUBMITTED",
+          events:["DEMO REQUEST CREATED","DEMO ESCROW RESERVED: $12.00 / NO REAL FUNDS"]}});
+      demoIndex = bounties.length-1;
+      renderBounties();
+    }
+    showBountyDetail(demoIndex);
     window.setTimeout(() => {
-      const section = $("#chainPanelTitle");
+      const section = $("#bountyDetailTitle");
       if (section) {
         section.scrollIntoView({ behavior: "smooth", block: "start" });
       }
